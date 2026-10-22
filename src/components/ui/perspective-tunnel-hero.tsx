@@ -246,24 +246,23 @@ export default function PerspectiveTunnelHero({
             if (advance(e.deltaY * 0.0008)) e.preventDefault();
         };
 
-        let lastY = 0;
-        const onTouchStart = (e: TouchEvent) => {
-            lastY = e.touches[0].clientY;
-        };
-        const onTouchMove = (e: TouchEvent) => {
-            const y = e.touches[0].clientY;
-            const dy = lastY - y;
-            lastY = y;
-            if (advance(dy * 0.0025)) e.preventDefault();
-        };
-
         el.addEventListener("wheel", handleWheel, { passive: false });
-        el.addEventListener("touchstart", onTouchStart, { passive: true });
-        el.addEventListener("touchmove", onTouchMove, { passive: false });
+
+        // Touch screens: leave the swipe to the page (native, smooth scrolling) and
+        // fly the tunnel on its own, slowly back and forth.
+        let raf = 0;
+        if (window.matchMedia("(pointer: coarse)").matches) {
+            const t0 = performance.now();
+            const loop = (now: number) => {
+                const k = (Math.sin((now - t0) / 4200 - Math.PI / 2) + 1) / 2; // 0..1..0
+                rawProgress.set(START + k * (0.86 - START));
+                raf = requestAnimationFrame(loop);
+            };
+            raf = requestAnimationFrame(loop);
+        }
         return () => {
             el.removeEventListener("wheel", handleWheel);
-            el.removeEventListener("touchstart", onTouchStart);
-            el.removeEventListener("touchmove", onTouchMove);
+            cancelAnimationFrame(raf);
         };
     }, [rawProgress]);
 

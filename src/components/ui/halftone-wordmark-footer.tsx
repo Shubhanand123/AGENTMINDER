@@ -209,7 +209,7 @@ function HalftoneWord({ word }: { word: string }) {
 
   return (
     <div ref={wrapRef} className="relative h-[clamp(60px,14vw,260px)] w-full">
-      <canvas ref={canvasRef} role="img" aria-label={word} className="absolute inset-0 block touch-none" />
+      <canvas ref={canvasRef} role="img" aria-label={word} className="absolute inset-0 block touch-pan-y" />
     </div>
   );
 }
