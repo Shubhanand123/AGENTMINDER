@@ -1,0 +1,383 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ───────────── shadcn theme tokens (AgentMinder: dark, emerald accent) ───────────── */
+:root {
+  --radius: 0.75rem;
+  --background: oklch(0.145 0.004 260);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.18 0.005 260);
+  --card-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.79 0.15 163);
+  --primary-foreground: oklch(0.17 0.02 170);
+  --secondary: oklch(0.24 0.006 260);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(0.24 0.006 260);
+  --muted-foreground: oklch(0.71 0.01 260);
+  --accent: oklch(0.26 0.01 260);
+  --accent-foreground: oklch(0.97 0 0);
+  --destructive: oklch(0.64 0.21 25);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.79 0.15 163);
+  /* used by the animated label input when it lifts */
+  --color-zinc-500: oklch(0.552 0.016 285.938);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-lg: var(--radius);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Inter Tight", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    margin: 0;
+  }
+  ::selection { background: oklch(0.79 0.15 163 / 35%); }
+}
+
+/* ───────────────── keyframes supplied with the orb component ───────────────── */
+@keyframes mo-spin { to { --angle: 360deg; } }
+@keyframes mo-drift { from { transform: translateX(-14%); } to { transform: translateX(14%); } }
+@keyframes mo-shimmer { from { background-position: 150% 0; } to { background-position: -100% 0; } }
+@keyframes mo-dot { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+@keyframes mo-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes mo-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-6px); } }
+@keyframes mo-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mo-fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes mo-shake {
+  0%, 100% { transform: translate(-50%, -50%); }
+  25% { transform: translate(calc(-50% - 4px), -50%); }
+  75% { transform: translate(calc(-50% + 4px), -50%); }
+}
+
+/* ───────────────── orb + input styles (the runtime drives the CSS variables) ───────────────── */
+@property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+.mo-root {
+  --em: 52 211 153;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  color: #f4f4f5;
+  font-family: var(--font-sans);
+}
+.mo-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(60% 50% at 50% 46%, rgb(var(--em) / 0.06), transparent 70%),
+    radial-gradient(#ffffff0f 1px, transparent 1px) 0 0 / 24px 24px;
+  mask-image: radial-gradient(ellipse 80% 75% at 50% 50%, #000 55%, transparent 100%);
+}
+.mo-halo {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 520px;
+  height: 520px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(var(--em) / 0.28), rgb(var(--em) / 0.06) 45%, transparent 70%);
+  opacity: var(--oCenter, 0);
+  pointer-events: none;
+}
+.mo-mover {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  width: 0;
+  height: 0;
+  will-change: transform;
+}
+.mo-trail {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 255 255 / 0.9), rgb(var(--em) / 0.6) 45%, transparent 72%);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+.mo-actor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--w);
+  height: var(--h);
+  border-radius: var(--r);
+  transform: translate(-50%, -50%) scale(var(--cs, 1));
+}
+.mo-actor[data-shake] { animation: mo-shake 0.26s ease-in-out; }
+.mo-actor > * { border-radius: inherit; }
+
+.mo-underglow {
+  position: absolute;
+  inset: -6px;
+  background: linear-gradient(90deg, rgb(var(--em) / 0.5), rgb(56 189 248 / 0.45), rgb(167 139 250 / 0.45));
+  filter: blur(22px);
+  opacity: calc(var(--oGlow) * 0.45);
+  transition: filter 0.3s;
+  pointer-events: none;
+}
+.mo-actor[data-typing] .mo-underglow { filter: blur(26px) brightness(1.35); }
+
+.mo-halo-green {
+  position: absolute;
+  inset: -48px;
+  border-radius: 50% !important;
+  background: radial-gradient(circle, rgb(var(--em) / 0.7), transparent 68%);
+  filter: blur(10px);
+  opacity: var(--oHalo);
+  pointer-events: none;
+}
+.mo-surface {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: rgb(20 20 23 / 0.92);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  box-shadow: 0 10px 40px -10px rgb(0 0 0 / 0.7), inset 0 1px 0 rgb(255 255 255 / 0.06);
+  opacity: var(--oPill);
+  transition: border-color 0.2s;
+}
+.mo-actor[data-flash] .mo-surface { border-color: rgb(251 146 60 / 0.8); }
+.mo-aurora {
+  position: absolute;
+  inset: 0;
+  opacity: calc(var(--oAur) * 0.55);
+  pointer-events: none;
+}
+.mo-aurora i {
+  position: absolute;
+  top: -60%;
+  width: 45%;
+  height: 220%;
+  border-radius: 50%;
+  filter: blur(26px);
+  animation: mo-drift 6s ease-in-out infinite alternate;
+}
+.mo-aurora i:nth-child(1) { left: -5%; background: rgb(var(--em) / 0.35); }
+.mo-aurora i:nth-child(2) { left: 25%; background: rgb(56 189 248 / 0.25); animation-duration: 7.5s; animation-delay: -2s; }
+.mo-aurora i:nth-child(3) { left: 55%; background: rgb(167 139 250 / 0.25); animation-duration: 8.5s; animation-delay: -4s; }
+.mo-aurora i:nth-child(4) { left: 80%; background: rgb(var(--em) / 0.25); animation-duration: 6.8s; animation-delay: -1s; }
+
+.mo-ball {
+  position: absolute;
+  inset: 0;
+  border-radius: 50% !important;
+  background: radial-gradient(circle at 35% 30%, #fff, #d1fae5 30%, rgb(var(--em)) 75%);
+  box-shadow: 0 0 40px rgb(var(--em) / 0.6);
+  opacity: var(--oBall);
+}
+.mo-green {
+  position: absolute;
+  inset: 0;
+  border-radius: 50% !important;
+  background: radial-gradient(circle at 40% 35%, #a7f3d0, rgb(var(--em)) 55%, #059669);
+  box-shadow: 0 0 60px rgb(var(--em) / 0.55);
+  transform: scale(var(--gs));
+  opacity: var(--oGreen);
+}
+.mo-card {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(28 28 32 / 0.96), rgb(18 18 21 / 0.96));
+  border: 1px solid rgb(var(--em) / 0.28);
+  box-shadow:
+    0 0 calc(var(--bloom) * 70px) rgb(var(--em) / calc(var(--bloom) * 0.25)),
+    0 20px 50px -20px rgb(0 0 0 / 0.8);
+  opacity: var(--oCard);
+}
+.mo-ring {
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  background: conic-gradient(from var(--angle), transparent 0deg, rgb(var(--em) / 0.9) 70deg, rgb(56 189 248 / 0.8) 140deg, transparent 220deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: mo-spin 4s linear infinite;
+  opacity: calc(var(--oRing) * 0.85);
+  pointer-events: none;
+}
+.mo-input {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px 0 20px;
+  opacity: var(--oInput);
+  transform: scale(var(--inScale));
+}
+.mo-spark { width: 18px; height: 18px; flex: none; color: rgb(var(--em) / 0.85); }
+.mo-field {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: #fafafa;
+  font: 500 16px/1 var(--font-sans);
+}
+.mo-field::placeholder { color: rgb(255 255 255 / 0.4); }
+.mo-send {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+  color: rgb(255 255 255 / 0.5);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+.mo-send svg { width: 20px; height: 20px; }
+.mo-send[data-ready] { background: rgb(var(--em)); color: #052e1f; }
+.mo-send[data-ready]:hover { transform: scale(1.06); }
+.mo-send:focus-visible { outline: 2px solid rgb(var(--em)); outline-offset: 2px; }
+
+.mo-orb {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 220px;
+  height: 220px;
+  transform: translate(-50%, -50%);
+  border-radius: 0 !important;
+  pointer-events: none;
+}
+.mo-pulse {
+  position: absolute;
+  inset: 0;
+  border-radius: 50% !important;
+  border: 2px solid rgb(var(--em));
+  opacity: 0;
+  pointer-events: none;
+}
+.mo-answer {
+  position: absolute;
+  inset: 0;
+  padding: 16px 20px;
+  opacity: var(--oCard);
+  outline: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+.mo-a-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(var(--em));
+  opacity: var(--hOp);
+}
+.mo-a-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgb(var(--em));
+  box-shadow: 0 0 10px rgb(var(--em));
+  transform: scale(var(--dotS));
+}
+.mo-a-body { margin: 10px 0 0; font-size: 14.5px; line-height: 1.5; color: rgb(255 255 255 / 0.9); }
+.mo-w { display: inline-block; opacity: 0; }
+
+.mo-status {
+  position: absolute;
+  left: 50%;
+  top: calc(46% + 96px);
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, calc(var(--sTy, 6) * 1px));
+  opacity: var(--sOp, 0);
+  pointer-events: none;
+}
+.mo-lab {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 13px/1 var(--font-mono);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.mo-in { animation: mo-in 0.3s ease-out both; }
+.mo-out { animation: mo-out 0.3s ease-in both; }
+.mo-lab-t {
+  background: linear-gradient(90deg, rgb(255 255 255 / 0.45) 0%, #fff 50%, rgb(255 255 255 / 0.45) 100%) 0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: mo-shimmer 1.8s linear infinite;
+}
+.mo-lab-done { color: rgb(var(--em)); }
+.mo-dots { display: inline-flex; gap: 3px; }
+.mo-dots i { width: 3px; height: 3px; border-radius: 50%; background: rgb(255 255 255 / 0.8); animation: mo-dot 1.2s infinite; }
+.mo-dots i:nth-child(2) { animation-delay: 0.15s; }
+.mo-dots i:nth-child(3) { animation-delay: 0.3s; }
+
+.mo-reset {
+  position: absolute;
+  left: 50%;
+  top: calc(46% + 98px);
+  transform: translateX(-50%);
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.15);
+  background: rgb(255 255 255 / 0.04);
+  color: rgb(255 255 255 / 0.8);
+  font: 500 14px/1 var(--font-sans);
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: background 0.2s;
+}
+.mo-reset:hover { background: rgb(255 255 255 / 0.1); }
+.mo-root[data-phase="answered"] .mo-reset { pointer-events: auto; animation: mo-fade-in 0.4s 0.15s ease-out both; }
+
+.mo-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.mo-debug {
+  position: absolute; left: 16px; bottom: 16px; display: flex; gap: 10px; align-items: center;
+  font: 12px var(--font-mono); color: #a1a1aa;
+}
+.mo-chip { padding: 4px 8px; border-radius: 6px; background: #27272a; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mo-ring, .mo-aurora i, .mo-lab-t, .mo-dots i { animation: none; }
+}
