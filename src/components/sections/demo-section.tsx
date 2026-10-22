@@ -15,7 +15,7 @@ function answer(question: string): string {
   return "This week your support bot resolved most chats on its own. 6 need a human look, mostly refund promises and one pricing error."
 }
 
-/** Section 3 — ask AgentMinder a question; the orb thinks and answers. */
+/** Section 4 — ask AgentMinder a question; the orb thinks and answers. */
 export function DemoSection() {
   return (
     <section id="demo" className="relative h-[100svh] min-h-[700px] overflow-hidden border-t border-white/5 bg-neutral-950">

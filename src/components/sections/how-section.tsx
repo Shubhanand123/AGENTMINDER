@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import { SectionHeading } from "./shared"
 
 const STEPS = [
@@ -34,18 +35,21 @@ export function HowSection() {
         <ol className="grid gap-5 md:grid-cols-3">
           {STEPS.map((s, i) => (
             <li key={s.n} className="relative flex min-w-0 flex-col gap-4 rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-7">
-              <span className="font-mono text-sm text-emerald-400">{s.n}</span>
+              <span className="font-mono text-sm text-indigo-300">{s.n}</span>
               <h3 className="font-display text-2xl font-semibold text-white">{s.title}</h3>
               <p className="leading-relaxed text-neutral-400">{s.body}</p>
               <code className="mt-auto truncate rounded-lg border border-white/10 bg-black/40 px-3 py-2 font-mono text-xs text-neutral-300">
                 {s.detail}
               </code>
               {i < STEPS.length - 1 && (
-                <span aria-hidden="true" className="absolute -right-4 top-1/2 hidden h-px w-3 bg-emerald-400/50 md:block" />
+                <span aria-hidden="true" className="absolute -right-4 top-1/2 hidden h-px w-3 bg-indigo-400/50 md:block" />
               )}
             </li>
           ))}
         </ol>
+        <Link to="/product" className="inline-flex min-h-12 items-center gap-2 self-start rounded-full px-6 font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/10">
+          See the full walkthrough <span aria-hidden="true">→</span>
+        </Link>
       </div>
     </section>
   )

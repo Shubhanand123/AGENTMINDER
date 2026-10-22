@@ -1,31 +1,104 @@
+import { useEffect, type MouseEvent } from "react"
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom"
+import { LayoutGroup } from "framer-motion"
 import { Nav } from "@/components/sections/nav"
-import { HeroSection } from "@/components/sections/hero-section"
-import { ProblemSection } from "@/components/sections/problem-section"
-import { DemoSection } from "@/components/sections/demo-section"
-import { HowSection } from "@/components/sections/how-section"
-import { PricingSection } from "@/components/sections/pricing-section"
-import { WaitlistSection } from "@/components/sections/waitlist-section"
-import { Logo } from "@/components/sections/shared"
+import HalftoneWordmarkFooter from "@/components/ui/halftone-wordmark-footer"
+import HomePage from "@/pages/home-page"
+import AgentsPage from "@/pages/agents-page"
+import AgentPage from "@/pages/agent-page"
+import ProductPage from "@/pages/product-page"
+import PricingPage from "@/pages/pricing-page"
+import DemoPage from "@/pages/demo-page"
+import WaitlistPage from "@/pages/waitlist-page"
+import NotFoundPage from "@/pages/not-found-page"
+
+const FOOTER_GROUPS = [
+  {
+    title: "Product",
+    links: [
+      { label: "How it works", href: "/product" },
+      { label: "Live demo", href: "/demo" },
+      { label: "Pricing", href: "/pricing" },
+    ],
+  },
+  {
+    title: "Agents",
+    links: [
+      { label: "Support desk", href: "/agents/support-desk" },
+      { label: "Sales agent", href: "/agents/sales-agent" },
+      { label: "Booking bot", href: "/agents/booking-bot" },
+      { label: "All agents", href: "/agents" },
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      { label: "Join the waitlist", href: "/waitlist" },
+      { label: "Free agent audit", href: "/waitlist?plan=free" },
+    ],
+  },
+]
+
+/** Jump to the top of each new page (but keep in-page #anchors working). */
+function ScrollToTop() {
+  const { pathname, hash } = useLocation()
+  useEffect(() => {
+    if (hash) {
+      document.getElementById(hash.slice(1))?.scrollIntoView()
+      return
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" as ScrollBehavior })
+  }, [pathname, hash])
+  return null
+}
 
 export default function App() {
+  const navigate = useNavigate()
+
+  // Plain <a href="/..."> links (footer, copy) navigate inside the app instead of reloading the page.
+  const onClickCapture = (e: MouseEvent<HTMLDivElement>) => {
+    const a = (e.target as HTMLElement).closest("a")
+    if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || a.target) return
+    const href = a.getAttribute("href") ?? ""
+    if (href === "#top") {
+      e.preventDefault()
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    } else if (href.startsWith("/") && !a.dataset.discover) {
+      e.preventDefault()
+      navigate(href)
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-neutral-950">
+    <div className="min-h-screen bg-neutral-950" onClickCapture={onClickCapture}>
+      <ScrollToTop />
       <Nav />
-      <main>
-        <HeroSection />
-        <ProblemSection />
-        <DemoSection />
-        <HowSection />
-        <PricingSection />
-        <WaitlistSection />
-      </main>
-      <footer className="border-t border-white/5 bg-neutral-950">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-10 text-sm text-neutral-500">
-          <Logo />
-          <span>© 2026 AgentMinder · agentminder.ai</span>
-          <a href="#top" className="transition-colors hover:text-white">Back to top</a>
-        </div>
-      </footer>
+      <LayoutGroup>
+        <main>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/agents" element={<AgentsPage />} />
+            <Route path="/agents/:slug" element={<AgentPage />} />
+            <Route path="/product" element={<ProductPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/demo" element={<DemoPage />} />
+            <Route path="/waitlist" element={<WaitlistPage />} />
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </main>
+      </LayoutGroup>
+      <HalftoneWordmarkFooter
+        word="AGENTMINDER"
+        studioLine={
+          <>
+            <span className="font-display text-base font-semibold text-white">AgentMinder</span>
+            <br />
+            Monitoring for AI agents, explained in plain language. Built in Goa, India.
+          </>
+        }
+        groups={FOOTER_GROUPS}
+        bottomLine="© 2026 AgentMinder · agentminder.ai"
+      />
     </div>
   )
 }

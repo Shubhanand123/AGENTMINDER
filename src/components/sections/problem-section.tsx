@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import { SectionHeading } from "./shared"
 
 const PROBLEMS = [
@@ -42,6 +43,9 @@ export function ProblemSection() {
             </article>
           ))}
         </div>
+        <Link to="/agents" className="inline-flex min-h-12 items-center gap-2 self-start rounded-full px-6 font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/10">
+          See real examples by agent type <span aria-hidden="true">→</span>
+        </Link>
       </div>
     </section>
   )

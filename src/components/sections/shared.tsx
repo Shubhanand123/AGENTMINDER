@@ -1,22 +1,30 @@
 import type { ReactNode } from "react"
+import { Link } from "react-router-dom"
 import { cn } from "@/lib/utils"
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <a href="#top" className={cn("flex items-center gap-2.5 text-white no-underline", className)}>
+    <Link to="/" aria-label="AgentMinder home" className={cn("flex items-center gap-2.5 text-white no-underline", className)}>
       <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">
+        <defs>
+          <linearGradient id="am-g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#818cf8" />
+            <stop offset="0.55" stopColor="#e879f9" />
+            <stop offset="1" stopColor="#fb923c" />
+          </linearGradient>
+        </defs>
         <rect width="32" height="32" rx="9" fill="#18181b" />
-        <circle cx="16" cy="16" r="7" fill="none" stroke="#34d399" strokeWidth="3" />
-        <circle cx="16" cy="16" r="2.4" fill="#34d399" />
+        <circle cx="16" cy="16" r="7" fill="none" stroke="url(#am-g)" strokeWidth="3" />
+        <circle cx="16" cy="16" r="2.4" fill="url(#am-g)" />
       </svg>
       <span className="font-display text-lg font-bold tracking-tight">AgentMinder</span>
-    </a>
+    </Link>
   )
 }
 
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="font-mono text-xs uppercase tracking-[0.3em] text-emerald-400">{children}</p>
+    <p className="font-mono text-xs uppercase tracking-[0.3em] text-indigo-300">{children}</p>
   )
 }
 

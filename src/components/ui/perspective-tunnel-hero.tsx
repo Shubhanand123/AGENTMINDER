@@ -10,31 +10,43 @@ import {
 } from "framer-motion";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
-/* Each card is one conversation the agent had. Swap in your own, or pass `items`. */
+import card1 from "@/assets/tunnel/card-1.jpg";
+import card2 from "@/assets/tunnel/card-2.jpg";
+import card3 from "@/assets/tunnel/card-3.jpg";
+import card4 from "@/assets/tunnel/card-4.jpg";
+import card5 from "@/assets/tunnel/card-5.jpg";
+import card6 from "@/assets/tunnel/card-6.jpg";
+import card7 from "@/assets/tunnel/card-7.jpg";
+import card8 from "@/assets/tunnel/card-8.jpg";
+import card9 from "@/assets/tunnel/card-9.jpg";
+
+/* Each card is one conversation the agent had, on the component's original artwork. */
 export type TunnelItem = {
+    src: string;
     tag: string;
     tone: "risk" | "wrong" | "cost" | "good";
     quote: string;
-    meta: string;
 };
 
+export const TUNNEL_IMAGES = [card1, card2, card3, card4, card5, card6, card7, card8, card9];
+
 const DEFAULT_ITEMS: TunnelItem[] = [
-    { tag: "Risky action", tone: "risk", quote: "No problem, I've refunded the full amount to your card.", meta: "Support bot · outside 30-day policy" },
-    { tag: "Resolved", tone: "good", quote: "Your order ships tomorrow. Here's the tracking link.", meta: "Support bot · 2 turns" },
-    { tag: "Wrong answer", tone: "wrong", quote: "Shipping to Pune is ₹49 flat.", meta: "Sales bot · price changed last month" },
-    { tag: "Cost spike", tone: "cost", quote: "Let me check that again for you…", meta: "Support bot · looped 41 times" },
-    { tag: "Resolved", tone: "good", quote: "I've reset your password. Check your inbox.", meta: "Helpdesk bot · 3 turns" },
-    { tag: "Risky action", tone: "risk", quote: "Sure, I'll apply a 50% discount to your renewal.", meta: "Sales bot · no approval" },
-    { tag: "Wrong answer", tone: "wrong", quote: "Yes, we're open on Sundays until 9 pm.", meta: "Booking bot · closed Sundays" },
-    { tag: "Resolved", tone: "good", quote: "Booked: Thursday, 4:30 pm with Dr. Mehta.", meta: "Booking bot · 4 turns" },
-    { tag: "Data leak", tone: "risk", quote: "The account email on file is r•••@gmail.com and the phone is…", meta: "Support bot · shared personal data" },
+    { src: card1, tag: "Risky action", tone: "risk", quote: "I've refunded the full amount to your card." },
+    { src: card2, tag: "Resolved", tone: "good", quote: "Your order ships tomorrow." },
+    { src: card3, tag: "Wrong answer", tone: "wrong", quote: "Shipping to Pune is ₹49 flat." },
+    { src: card4, tag: "Cost spike", tone: "cost", quote: "Let me check that again for you…" },
+    { src: card5, tag: "Resolved", tone: "good", quote: "Password reset. Check your inbox." },
+    { src: card6, tag: "Risky action", tone: "risk", quote: "Sure, 50% off your renewal." },
+    { src: card7, tag: "Wrong answer", tone: "wrong", quote: "Yes, we're open on Sundays." },
+    { src: card8, tag: "Resolved", tone: "good", quote: "Booked: Thursday, 4:30 pm." },
+    { src: card9, tag: "Data leak", tone: "risk", quote: "The email on file is r•••@gmail.com…" },
 ];
 
 const TONE: Record<TunnelItem["tone"], string> = {
-    risk: "bg-orange-500/15 text-orange-300 ring-orange-400/30",
-    wrong: "bg-amber-400/15 text-amber-200 ring-amber-300/30",
-    cost: "bg-sky-400/15 text-sky-200 ring-sky-300/30",
-    good: "bg-emerald-400/15 text-emerald-200 ring-emerald-300/30",
+    risk: "bg-orange-500/90 text-white",
+    wrong: "bg-amber-400/95 text-amber-950",
+    cost: "bg-sky-400/95 text-sky-950",
+    good: "bg-violet-400/95 text-violet-950",
 };
 
 interface TunnelCardData {
@@ -63,6 +75,9 @@ const buildCards = (items: TunnelItem[]): TunnelCardData[] =>
             index: i,
         };
     });
+
+/* Progress the tunnel opens at: a few cards are already in view, so the cursor parallax shows straight away. */
+const START = 0.3;
 
 const SPRING_CONFIG = { stiffness: 60, damping: 25, mass: 0.5 };
 
@@ -113,12 +128,12 @@ function TunnelCard({ card, progress, pointer, total, stage }: TunnelCardProps) 
     const opacity = useTransform(localProgress, [0, 0.18, 0.82, 0.98], [0, 1, 1, 0]);
 
     const cardWidth = stage.isMobile
-        ? Math.max(170, Math.min(220, stage.width * 0.5))
-        : Math.max(220, Math.min(300, stage.width * 0.2));
+        ? Math.max(130, Math.min(180, stage.width * 0.38))
+        : Math.max(180, Math.min(270, stage.width * 0.18));
 
     const baseX = card.angleCos * (stage.width * card.radiusFactorX);
     const baseY = card.angleSin * (stage.height * card.radiusFactorY);
-    const panStrength = stage.isMobile ? 20 : 45;
+    const panStrength = stage.isMobile ? 24 : 70;
 
     const transform = useTransform(
         [z, pointer.x, pointer.y],
@@ -139,14 +154,23 @@ function TunnelCard({ card, progress, pointer, total, stage }: TunnelCardProps) 
                 opacity,
                 zIndex: card.index + 1,
             }}
-            className="pointer-events-auto absolute left-1/2 top-1/2 will-change-transform select-none"
+            className="pointer-events-auto absolute left-1/2 top-1/2 aspect-[4/5] will-change-transform select-none cursor-pointer"
         >
-            <div className="group relative flex flex-col gap-3 overflow-hidden rounded-2xl bg-neutral-900/90 p-4 sm:p-5 shadow-2xl shadow-black/80 ring-1 ring-white/10 backdrop-blur transition-all duration-500 hover:ring-emerald-400/60 hover:shadow-emerald-500/20">
-                <span className={`self-start rounded-md px-2 py-1 font-mono text-[10px] sm:text-[11px] uppercase tracking-widest ring-1 ${TONE[item.tone]}`}>
+            <div className="group relative h-full w-full overflow-hidden rounded-2xl bg-neutral-900 shadow-2xl shadow-black/90 ring-1 ring-white/15 transition-all duration-500 hover:ring-indigo-400/70 hover:shadow-indigo-500/25">
+                <img
+                    src={item.src}
+                    alt=""
+                    draggable={false}
+                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                />
+                <span className={`absolute left-3 top-3 rounded-md px-2 py-1 font-mono text-[10px] font-medium uppercase tracking-widest shadow-lg ${TONE[item.tone]}`}>
                     {item.tag}
                 </span>
-                <p className="text-sm sm:text-[15px] leading-snug text-white/90">“{item.quote}”</p>
-                <span className="font-mono text-[10px] sm:text-[11px] tracking-wide text-white/45">{item.meta}</span>
+                <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/85 via-black/15 to-transparent p-4 sm:p-5">
+                    <span className="text-xs sm:text-sm font-mono leading-snug tracking-wide text-white/95 drop-shadow-md">
+                        “{item.quote}”
+                    </span>
+                </div>
             </div>
         </motion.div>
     );
@@ -196,7 +220,7 @@ export default function PerspectiveTunnelHero({
     }, []);
 
     // Raw motion value controlled directly by mouse wheel / trackpad / touch
-    const rawProgress = useMotionValue(0);
+    const rawProgress = useMotionValue(START);
     const smoothProgress = useSpring(rawProgress, {
         stiffness: 80,
         damping: 30,
@@ -211,10 +235,10 @@ export default function PerspectiveTunnelHero({
 
         const advance = (delta: number) => {
             const current = rawProgress.get();
-            if ((delta > 0 && current >= 1) || (delta < 0 && current <= 0)) return false;
+            if ((delta > 0 && current >= 1) || (delta < 0 && current <= START)) return false;
             const rect = el.getBoundingClientRect();
             if (Math.abs(rect.top) > 4) return false; // only fly when the hero fills the screen
-            rawProgress.set(Math.min(1, Math.max(0, current + delta)));
+            rawProgress.set(Math.min(1, Math.max(START, current + delta)));
             return true;
         };
 
@@ -247,7 +271,7 @@ export default function PerspectiveTunnelHero({
 
     const titleScale = useTransform(smoothProgress, [0, 0.5, 1], [0.8, 1, 1.35]);
     const titleOpacity = useTransform(smoothProgress, [0, 0.12, 0.85, 1], [0.6, 1, 1, 0]);
-    const promptOpacity = useTransform(smoothProgress, [0, 0.12], [1, 0]);
+    const promptOpacity = useTransform(smoothProgress, [START, START + 0.1], [1, 0]);
     const doneOpacity = useTransform(smoothProgress, [0.9, 1], [0, 1]);
 
     return (
@@ -260,11 +284,11 @@ export default function PerspectiveTunnelHero({
             }}
         >
             {/* Immersive Background Grid & Glow */}
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#134e4a_1px,transparent_1px)] [background-size:28px_28px] [mask-image:radial-gradient(ellipse_70%_70%_at_50%_50%,#000_60%,transparent_100%)] opacity-70" />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.16)_0%,transparent_72%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(#1e1b4b_1px,transparent_1px)] [background-size:28px_28px] [mask-image:radial-gradient(ellipse_70%_70%_at_50%_50%,#000_60%,transparent_100%)] opacity-70" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.22)_0%,transparent_75%)]" />
 
             {/* Depth Ring Guides */}
-            <div className="pointer-events-none absolute h-[48vmin] w-[48vmin] rounded-full border border-emerald-400/15" />
+            <div className="pointer-events-none absolute h-[48vmin] w-[48vmin] rounded-full border border-indigo-400/15" />
             <div className="pointer-events-none absolute h-[76vmin] w-[76vmin] rounded-full border border-dashed border-white/10" />
 
             {/* Central Anchor Typography */}
@@ -272,7 +296,7 @@ export default function PerspectiveTunnelHero({
                 style={{ scale: titleScale, opacity: titleOpacity }}
                 className="pointer-events-none z-0 flex flex-col items-center text-center px-6 max-w-2xl"
             >
-                <p className="text-xs font-mono uppercase tracking-[0.4em] text-emerald-400 mb-4">
+                <p className="text-xs font-mono uppercase tracking-[0.4em] text-indigo-300 mb-4">
                     {eyebrow}
                 </p>
                 <h1 className="font-display text-5xl sm:text-7xl md:text-8xl font-bold tracking-tighter leading-[0.9] bg-gradient-to-b from-white via-white to-white/40 bg-clip-text text-transparent">
@@ -289,13 +313,13 @@ export default function PerspectiveTunnelHero({
                 className="pointer-events-none absolute bottom-8 z-20 flex flex-col items-center gap-2 text-xs font-mono uppercase tracking-[0.3em] text-neutral-400"
             >
                 <span>Scroll to explore</span>
-                <div className="h-6 w-px bg-gradient-to-b from-emerald-400 to-transparent" />
+                <div className="h-6 w-px bg-gradient-to-b from-indigo-400 to-transparent" />
             </motion.div>
 
             {/* End-of-tunnel hint */}
             <motion.div
                 style={{ opacity: doneOpacity }}
-                className="pointer-events-none absolute bottom-8 z-20 font-mono text-xs uppercase tracking-[0.3em] text-emerald-300"
+                className="pointer-events-none absolute bottom-8 z-20 font-mono text-xs uppercase tracking-[0.3em] text-indigo-200"
             >
                 9 chats · 6 need you · keep scrolling
             </motion.div>

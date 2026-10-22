@@ -1,5 +1,6 @@
 import { ConfettiButton } from "@/components/ui/confetti"
 import { cn } from "@/lib/utils"
+import { Link } from "react-router-dom"
 import { SectionHeading } from "./shared"
 
 const PLANS = [
@@ -38,14 +39,14 @@ export function PricingSection() {
                 className={cn(
                   "flex flex-col gap-6 rounded-2xl border p-7",
                   featured
-                    ? "border-emerald-400/60 bg-emerald-400/[0.06] shadow-[0_0_60px_-20px_rgba(52,211,153,0.5)]"
+                    ? "border-indigo-400/60 bg-indigo-400/[0.07] shadow-[0_0_70px_-20px_rgba(129,140,248,0.6)]"
                     : "border-white/10 bg-white/[0.02]",
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="text-lg font-semibold text-white">{p.name}</h3>
                   {p.badge && (
-                    <span className="rounded-full bg-emerald-400 px-2.5 py-1 text-xs font-semibold text-emerald-950">{p.badge}</span>
+                    <span className="rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300 px-2.5 py-1 text-xs font-semibold text-neutral-950">{p.badge}</span>
                   )}
                 </div>
                 <div>
@@ -56,7 +57,7 @@ export function PricingSection() {
                 <ul className="flex flex-col gap-2.5 text-sm text-neutral-300">
                   {p.features.map((f) => (
                     <li key={f} className="flex gap-2.5">
-                      <svg viewBox="0 0 16 16" className="mt-0.5 h-4 w-4 flex-none text-emerald-400" aria-hidden="true">
+                      <svg viewBox="0 0 16 16" className="mt-0.5 h-4 w-4 flex-none text-indigo-300" aria-hidden="true">
                         <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                       {f}
@@ -70,7 +71,7 @@ export function PricingSection() {
                   options={{
                     particleCount: featured ? 120 : 60,
                     spread: featured ? 90 : 60,
-                    colors: ["#34d399", "#6ee7b7", "#38bdf8", "#ffffff"],
+                    colors: ["#818cf8", "#e879f9", "#fb923c", "#38bdf8", "#f472b6"],
                   }}
                   onClick={goToWaitlist}
                 >
@@ -80,6 +81,9 @@ export function PricingSection() {
             )
           })}
         </div>
+        <Link to="/pricing" className="inline-flex min-h-12 items-center gap-2 self-start rounded-full px-6 font-semibold text-white ring-1 ring-white/20 transition-colors hover:bg-white/10">
+          Compare plans, yearly prices and FAQ <span aria-hidden="true">→</span>
+        </Link>
       </div>
     </section>
   )

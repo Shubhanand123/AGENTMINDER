@@ -3,15 +3,15 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* ───────────── shadcn theme tokens (AgentMinder: dark, emerald accent) ───────────── */
+/* ───────────── shadcn theme tokens (AgentMinder: dark, indigo → pink → orange accent) ───────────── */
 :root {
   --radius: 0.75rem;
   --background: oklch(0.145 0.004 260);
   --foreground: oklch(0.97 0 0);
   --card: oklch(0.18 0.005 260);
   --card-foreground: oklch(0.97 0 0);
-  --primary: oklch(0.79 0.15 163);
-  --primary-foreground: oklch(0.17 0.02 170);
+  --primary: oklch(0.68 0.16 277);
+  --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.24 0.006 260);
   --secondary-foreground: oklch(0.97 0 0);
   --muted: oklch(0.24 0.006 260);
@@ -22,7 +22,7 @@
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.79 0.15 163);
+  --ring: oklch(0.68 0.16 277);
   /* used by the animated label input when it lifts */
   --color-zinc-500: oklch(0.552 0.016 285.938);
 }
@@ -58,7 +58,7 @@
     @apply bg-background text-foreground font-sans antialiased;
     margin: 0;
   }
-  ::selection { background: oklch(0.79 0.15 163 / 35%); }
+  ::selection { background: oklch(0.68 0.16 277 / 40%); }
 }
 
 /* ───────────────── keyframes supplied with the orb component ───────────────── */
@@ -80,7 +80,9 @@
 @property --angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
 
 .mo-root {
-  --em: 52 211 153;
+  --em: 129 140 248;
+  --pk: 232 121 249;
+  --or: 251 146 60;
   position: absolute;
   inset: 0;
   overflow: hidden;
@@ -122,7 +124,7 @@
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgb(255 255 255 / 0.9), rgb(var(--em) / 0.6) 45%, transparent 72%);
+  background: radial-gradient(circle, rgb(255 255 255 / 0.9), rgb(var(--pk) / 0.6) 45%, transparent 72%);
   opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
@@ -142,7 +144,7 @@
 .mo-underglow {
   position: absolute;
   inset: -6px;
-  background: linear-gradient(90deg, rgb(var(--em) / 0.5), rgb(56 189 248 / 0.45), rgb(167 139 250 / 0.45));
+  background: linear-gradient(90deg, rgb(var(--em) / 0.55), rgb(var(--pk) / 0.5), rgb(var(--or) / 0.45));
   filter: blur(22px);
   opacity: calc(var(--oGlow) * 0.45);
   transition: filter 0.3s;
@@ -154,7 +156,7 @@
   position: absolute;
   inset: -48px;
   border-radius: 50% !important;
-  background: radial-gradient(circle, rgb(var(--em) / 0.7), transparent 68%);
+  background: radial-gradient(circle, rgb(var(--pk) / 0.55), rgb(var(--em) / 0.35) 45%, transparent 68%);
   filter: blur(10px);
   opacity: var(--oHalo);
   pointer-events: none;
@@ -186,15 +188,15 @@
   animation: mo-drift 6s ease-in-out infinite alternate;
 }
 .mo-aurora i:nth-child(1) { left: -5%; background: rgb(var(--em) / 0.35); }
-.mo-aurora i:nth-child(2) { left: 25%; background: rgb(56 189 248 / 0.25); animation-duration: 7.5s; animation-delay: -2s; }
-.mo-aurora i:nth-child(3) { left: 55%; background: rgb(167 139 250 / 0.25); animation-duration: 8.5s; animation-delay: -4s; }
+.mo-aurora i:nth-child(2) { left: 25%; background: rgb(var(--pk) / 0.3); animation-duration: 7.5s; animation-delay: -2s; }
+.mo-aurora i:nth-child(3) { left: 55%; background: rgb(var(--or) / 0.25); animation-duration: 8.5s; animation-delay: -4s; }
 .mo-aurora i:nth-child(4) { left: 80%; background: rgb(var(--em) / 0.25); animation-duration: 6.8s; animation-delay: -1s; }
 
 .mo-ball {
   position: absolute;
   inset: 0;
   border-radius: 50% !important;
-  background: radial-gradient(circle at 35% 30%, #fff, #d1fae5 30%, rgb(var(--em)) 75%);
+  background: radial-gradient(circle at 35% 30%, #fff, #e0e7ff 30%, rgb(var(--em)) 75%);
   box-shadow: 0 0 40px rgb(var(--em) / 0.6);
   opacity: var(--oBall);
 }
@@ -202,7 +204,7 @@
   position: absolute;
   inset: 0;
   border-radius: 50% !important;
-  background: radial-gradient(circle at 40% 35%, #a7f3d0, rgb(var(--em)) 55%, #059669);
+  background: radial-gradient(circle at 30% 25%, #fde68a, rgb(var(--or)) 22%, rgb(var(--pk)) 52%, rgb(var(--em)) 80%);
   box-shadow: 0 0 60px rgb(var(--em) / 0.55);
   transform: scale(var(--gs));
   opacity: var(--oGreen);
@@ -221,7 +223,7 @@
   position: absolute;
   inset: 0;
   padding: 1px;
-  background: conic-gradient(from var(--angle), transparent 0deg, rgb(var(--em) / 0.9) 70deg, rgb(56 189 248 / 0.8) 140deg, transparent 220deg);
+  background: conic-gradient(from var(--angle), transparent 0deg, rgb(var(--em) / 0.95) 70deg, rgb(var(--pk) / 0.9) 140deg, rgb(var(--or) / 0.8) 180deg, transparent 220deg);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -265,7 +267,7 @@
   transition: background 0.2s, color 0.2s, transform 0.2s;
 }
 .mo-send svg { width: 20px; height: 20px; }
-.mo-send[data-ready] { background: rgb(var(--em)); color: #052e1f; }
+.mo-send[data-ready] { background: linear-gradient(135deg, rgb(var(--em)), rgb(var(--pk))); color: #fff; }
 .mo-send[data-ready]:hover { transform: scale(1.06); }
 .mo-send:focus-visible { outline: 2px solid rgb(var(--em)); outline-offset: 2px; }
 

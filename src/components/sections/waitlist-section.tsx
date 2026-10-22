@@ -11,7 +11,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 /* Two side cannons, as in the confetti demo, in AgentMinder colours. */
 function sideCannons() {
   const end = Date.now() + 1800
-  const colors = ["#34d399", "#6ee7b7", "#38bdf8", "#f4f4f5"]
+  const colors = ["#818cf8", "#e879f9", "#fb923c", "#38bdf8", "#f472b6"]
   const frame = () => {
     if (Date.now() > end) return
     confetti({ particleCount: 3, angle: 60, spread: 55, startVelocity: 60, origin: { x: 0, y: 0.6 }, colors })
@@ -22,7 +22,7 @@ function sideCannons() {
 }
 
 /** Section 6 — waitlist with the animated-label inputs; confetti on success. */
-export function WaitlistSection() {
+export function WaitlistSection({ plan }: { plan?: string } = {}) {
   const confettiRef = useRef<ConfettiRef>(null)
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -38,22 +38,31 @@ export function WaitlistSection() {
     }
     setError("")
     setJoined(true)
-    // TODO: send { name, email, company } to your backend (e.g. a Supabase table or Resend audience).
-    confettiRef.current?.fire({ particleCount: 140, spread: 100, origin: { y: 0.55 }, colors: ["#34d399", "#6ee7b7", "#38bdf8", "#ffffff"] })
+    // TODO: send { name, email, company, plan } to your backend (e.g. a Supabase table or Resend audience).
+    confettiRef.current?.fire({ particleCount: 140, spread: 100, origin: { y: 0.55 }, colors: ["#818cf8", "#e879f9", "#fb923c", "#38bdf8", "#f472b6"] })
     sideCannons()
   }
 
   return (
     <section id="waitlist" className="relative overflow-hidden border-t border-white/5 bg-neutral-950 py-28 sm:py-36">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_50%_100%,rgba(52,211,153,0.16),transparent)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(50%_60%_at_50%_100%,rgba(129,140,248,0.2),transparent)]" />
       <Confetti ref={confettiRef} manualstart className="pointer-events-none absolute inset-0 z-20 size-full" />
 
       <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-14 px-5 lg:grid-cols-2">
         <div className="flex flex-col gap-5">
           <Eyebrow>Early access</Eyebrow>
           <h2 className="font-display text-4xl font-bold leading-[1.02] tracking-tight text-white sm:text-6xl">
-            Know what your AI agent said <span className="text-emerald-400">before your customers tell you.</span>
+            Know what your AI agent said <span className="text-indigo-300">before your customers tell you.</span>
           </h2>
+          {plan && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="self-start rounded-full bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-orange-200 px-3 py-1 text-sm font-semibold capitalize text-neutral-950"
+            >
+              Reserving the {plan} plan
+            </motion.span>
+          )}
           <p className="max-w-[46ch] text-lg leading-relaxed text-neutral-400">
             Join the waitlist for founding prices and a free agent audit: upload your bot's chats, get a risk report.
           </p>
@@ -69,7 +78,7 @@ export function WaitlistSection() {
                 className="flex flex-col items-start gap-4"
                 role="status"
               >
-                <span className="grid h-12 w-12 place-items-center rounded-full bg-emerald-400 text-emerald-950">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-indigo-400 via-fuchsia-400 to-orange-300 text-neutral-950">
                   <svg viewBox="0 0 16 16" className="h-6 w-6" aria-hidden="true">
                     <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
