@@ -1,27 +1,22 @@
-import { useNavigate } from "react-router-dom"
-import OrbitGallery from "@/components/ui/orbit-gallery"
+import { WorksWheel, type WorksWheelItem } from "@/components/ui/works-wheel"
 import { AGENTS } from "@/data/agents"
 import { SectionHeading } from "./shared"
 
-/** Section 3 — the ring gallery of agent types. */
+const ITEMS: WorksWheelItem[] = AGENTS.map((a) => ({ title: a.title, image: a.image, href: `/agents/${a.slug}` }))
+
+/** Section 3 — the works wheel: a ring of agent types that turns into a drum as you scroll. */
 export function AgentsSection() {
-  const navigate = useNavigate()
-  const items = AGENTS.map((a) => ({ src: a.image, title: a.title, caption: a.caption }))
   return (
-    <section id="agents" className="relative overflow-hidden border-t border-white/5 bg-neutral-950 py-28 sm:py-32">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(45%_45%_at_45%_50%,rgba(129,140,248,0.12),transparent)]" />
-      <div className="relative mx-auto flex max-w-6xl flex-col gap-10 px-5">
+    <section id="agents" className="relative border-t border-white/5 bg-background pt-28 sm:pt-32">
+      <div className="mx-auto max-w-6xl px-5">
         <SectionHeading
           eyebrow="Works with every agent"
           title="Whatever your bot does, AgentMinder watches it."
-          lead="Spin the ring, pick an agent, and open its page to see the chats we'd flag."
+          lead="Scroll over the ring to turn it into a wheel, then click any agent to open its page."
         />
-        <OrbitGallery
-          items={items}
-          centerLabel="Agents '26"
-          openLabel="Open"
-          onOpen={(_, i) => navigate(`/agents/${AGENTS[i].slug}`)}
-        />
+      </div>
+      <div className="relative mt-6 h-[88svh] min-h-[560px] w-full">
+        <WorksWheel items={ITEMS} label="Agents '26" action="Open" className="font-display" />
       </div>
     </section>
   )

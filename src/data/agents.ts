@@ -1,4 +1,14 @@
-import { TUNNEL_IMAGES } from "@/components/ui/perspective-tunnel-hero"
+import art0 from "@/assets/wheel/prismatic-rift-anime.jpg"
+import art1 from "@/assets/wheel/red-ribbon-typography.jpg"
+import art2 from "@/assets/wheel/neon-cave-portal-silhouette.jpg"
+import art3 from "@/assets/wheel/indigo-liquid-marble.jpg"
+import art4 from "@/assets/wheel/rocket-launch-gradient.jpg"
+import art5 from "@/assets/wheel/black-hole-ember-clouds.jpg"
+import art6 from "@/assets/wheel/neon-portrait-uplight.jpg"
+import art7 from "@/assets/wheel/astronaut-cosmic-wave.jpg"
+import art8 from "@/assets/wheel/celestial-light-figure.jpg"
+
+const ART = [art0, art1, art2, art3, art4, art5, art6, art7, art8]
 
 export type Flag = { tone: "risk" | "wrong" | "cost" | "leak"; label: string }
 
@@ -135,7 +145,7 @@ const raw: Omit<Agent, "image">[] = [
   },
 ]
 
-export const AGENTS: Agent[] = raw.map((a, i) => ({ ...a, image: TUNNEL_IMAGES[i % TUNNEL_IMAGES.length] }))
+export const AGENTS: Agent[] = raw.map((a, i) => ({ ...a, image: ART[i % ART.length] }))
 
 export const agentBySlug = (slug?: string) => AGENTS.find((a) => a.slug === slug)
 

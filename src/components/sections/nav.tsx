@@ -6,9 +6,10 @@ import { Logo } from "./shared"
 import { ThemeToggle } from "@/components/site/theme-toggle"
 
 const LINKS = [
+  { to: "/features", label: "Features" },
   { to: "/agents", label: "Agents" },
   { to: "/product", label: "How it works" },
-  { to: "/demo", label: "Live demo" },
+  { to: "/demo", label: "Demo" },
   { to: "/pricing", label: "Pricing" },
 ]
 

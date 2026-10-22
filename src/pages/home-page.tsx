@@ -1,6 +1,8 @@
 import { HeroSection } from "@/components/sections/hero-section"
 import { ProblemSection } from "@/components/sections/problem-section"
 import { AgentsSection } from "@/components/sections/agents-section"
+import { TearSection } from "@/components/sections/tear-section"
+import { FeaturesSection } from "@/components/sections/features-section"
 import { DemoSection } from "@/components/sections/demo-section"
 import { HowSection } from "@/components/sections/how-section"
 import { PricingSection } from "@/components/sections/pricing-section"
@@ -11,7 +13,9 @@ export default function HomePage() {
     <>
       <HeroSection />
       <ProblemSection />
+      <TearSection />
       <AgentsSection />
+      <FeaturesSection />
       <DemoSection />
       <HowSection />
       <PricingSection />

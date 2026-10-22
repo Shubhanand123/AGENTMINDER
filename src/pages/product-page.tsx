@@ -2,32 +2,33 @@ import { useEffect, useRef, useState } from "react"
 import { Link } from "react-router-dom"
 import { AnimatePresence, motion, useScroll, useSpring, useTransform } from "framer-motion"
 import { Page, PageHeader, GradientText, Reveal, RevealItem } from "@/components/site/motion"
-import { TUNNEL_IMAGES } from "@/components/ui/perspective-tunnel-hero"
+import type { ComponentType } from "react"
+import { AlertStack, DigestType, IntegrationMarquee } from "@/components/features/visuals"
 
 const STEPS = [
   {
     title: "Connect your agent",
     body: "Change one line so your OpenAI or Anthropic calls go through AgentMinder, connect Intercom or Voiceflow, or upload a CSV of past chats.",
     code: 'baseURL: "https://proxy.agentminder.ai/v1"',
-    img: TUNNEL_IMAGES[3],
+    Visual: IntegrationMarquee as ComponentType,
   },
   {
     title: "Every chat gets read",
     body: "A small, cheap model reviews each conversation and tags it: resolved or not, risky actions, wrong answers, sentiment and cost.",
     code: "resolved · risky · wrong · cost",
-    img: TUNNEL_IMAGES[2],
+    Visual: TagStream as ComponentType,
   },
   {
     title: "Only the few that matter reach you",
     body: "Out of hundreds of chats, you see the handful that need a human, with the transcript and a suggested fix.",
     code: "1,240 chats → 6 need you",
-    img: TUNNEL_IMAGES[0],
+    Visual: DigestType as ComponentType,
   },
   {
     title: "Alerts where you already work",
     body: "Email and Slack the moment something goes wrong, plus a weekly health score you can forward to your team or your client.",
     code: "#support-alerts · weekly digest",
-    img: TUNNEL_IMAGES[8],
+    Visual: AlertStack as ComponentType,
   },
 ]
 
@@ -86,7 +87,7 @@ function TagStream() {
 function Step({ step, index }: { step: (typeof STEPS)[number]; index: number }) {
   const ref = useRef<HTMLDivElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] })
-  const imgY = useTransform(scrollYProgress, [0, 1], ["-12%", "12%"])
+  const imgY = useTransform(scrollYProgress, [0, 1], [24, -24])
   const rotate = useTransform(scrollYProgress, [0, 0.5, 1], [index % 2 ? 4 : -4, 0, index % 2 ? -4 : 4])
   return (
     <div ref={ref} className="grid items-center gap-10 py-14 lg:grid-cols-2">
@@ -102,15 +103,11 @@ function Step({ step, index }: { step: (typeof STEPS)[number]; index: number }) 
         <p className="max-w-[48ch] text-lg leading-relaxed text-neutral-400">{step.body}</p>
         <code className="self-start truncate rounded-lg border border-white/10 bg-black/40 px-3 py-2 font-mono text-sm text-neutral-200">{step.code}</code>
       </motion.div>
-      <motion.div style={{ rotate }} className="relative aspect-[4/3] overflow-hidden rounded-3xl ring-1 ring-white/10">
-        <motion.img src={step.img} alt="" style={{ y: imgY, scale: 1.25 }} className="h-full w-full object-cover" />
-        {index === 1 && (
-          <div className="keep-dark absolute inset-0 grid place-items-center bg-black/35 p-6">
-            <div className="w-full max-w-sm">
-              <TagStream />
-            </div>
-          </div>
-        )}
+      <motion.div style={{ rotate }} className="relative overflow-hidden rounded-3xl p-px">
+        <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-br from-indigo-400/60 via-fuchsia-400/40 to-orange-300/50" />
+        <motion.div style={{ y: imgY }} className="relative flex min-h-[260px] flex-col justify-center rounded-[calc(1.5rem-1px)] bg-neutral-900 p-6 sm:p-8">
+          <step.Visual />
+        </motion.div>
       </motion.div>
     </div>
   )

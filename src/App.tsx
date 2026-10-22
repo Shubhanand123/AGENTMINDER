@@ -7,6 +7,7 @@ import HomePage from "@/pages/home-page"
 import AgentsPage from "@/pages/agents-page"
 import AgentPage from "@/pages/agent-page"
 import ProductPage from "@/pages/product-page"
+import FeaturesPage from "@/pages/features-page"
 import PricingPage from "@/pages/pricing-page"
 import DemoPage from "@/pages/demo-page"
 import WaitlistPage from "@/pages/waitlist-page"
@@ -16,6 +17,7 @@ const FOOTER_GROUPS = [
   {
     title: "Product",
     links: [
+      { label: "Features", href: "/features" },
       { label: "How it works", href: "/product" },
       { label: "Live demo", href: "/demo" },
       { label: "Pricing", href: "/pricing" },
@@ -80,6 +82,7 @@ export default function App() {
             <Route path="/agents" element={<AgentsPage />} />
             <Route path="/agents/:slug" element={<AgentPage />} />
             <Route path="/product" element={<ProductPage />} />
+            <Route path="/features" element={<FeaturesPage />} />
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/demo" element={<DemoPage />} />
             <Route path="/waitlist" element={<WaitlistPage />} />
