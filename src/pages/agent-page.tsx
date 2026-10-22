@@ -73,7 +73,7 @@ export default function AgentPage() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.3, duration: 0.5 }}
-                  className="max-w-[80%] self-end rounded-2xl rounded-tr-sm bg-gradient-to-r from-indigo-500/80 to-fuchsia-500/80 px-4 py-3 text-white"
+                  className="max-w-[80%] self-end rounded-2xl rounded-tr-sm bg-gradient-to-r from-indigo-500 to-fuchsia-500 px-4 py-3 text-[#fff]"
                 >
                   {c.bot}
                 </motion.div>
@@ -131,7 +131,7 @@ export default function AgentPage() {
 
       {/* Next agent: the card previews the next page */}
       <section className="mx-auto max-w-6xl px-5 pb-32">
-        <Link to={`/agents/${next.slug}`} className="group relative block h-64 overflow-hidden rounded-3xl ring-1 ring-white/10">
+        <Link to={`/agents/${next.slug}`} className="keep-dark group relative block h-64 overflow-hidden rounded-3xl ring-1 ring-white/10">
           <motion.div layoutId={`agent-img-${next.slug}`} className="absolute inset-0">
             <img src={next.image} alt="" className="h-full w-full object-cover opacity-70 transition-all duration-700 group-hover:scale-105 group-hover:opacity-90" />
           </motion.div>

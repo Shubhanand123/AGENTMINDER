@@ -46,7 +46,7 @@ export function PricingSection() {
                 <div className="flex items-center justify-between gap-2">
                   <h3 className="text-lg font-semibold text-white">{p.name}</h3>
                   {p.badge && (
-                    <span className="rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300 px-2.5 py-1 text-xs font-semibold text-neutral-950">{p.badge}</span>
+                    <span className="rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300 px-2.5 py-1 text-xs font-semibold text-[#0a0a0a]">{p.badge}</span>
                   )}
                 </div>
                 <div>

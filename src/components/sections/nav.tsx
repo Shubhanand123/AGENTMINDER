@@ -3,6 +3,7 @@ import { NavLink, useLocation } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 import { Logo } from "./shared"
+import { ThemeToggle } from "@/components/site/theme-toggle"
 
 const LINKS = [
   { to: "/agents", label: "Agents" },
@@ -53,9 +54,10 @@ export function Nav() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <NavLink
             to="/waitlist"
-            className="inline-flex min-h-11 items-center rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300 px-5 text-sm font-semibold text-neutral-950 transition-transform hover:scale-[1.04]"
+            className="hidden min-h-11 items-center rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300 px-5 text-sm font-semibold sm:inline-flex text-[#0a0a0a] transition-transform hover:scale-[1.04]"
           >
             Join the waitlist
           </NavLink>
@@ -90,6 +92,11 @@ export function Nav() {
                   </NavLink>
                 </motion.li>
               ))}
+              <li className="pt-3">
+                <NavLink to="/waitlist" className="flex min-h-12 items-center justify-center rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300 font-semibold text-[#0a0a0a]">
+                  Join the waitlist
+                </NavLink>
+              </li>
             </ul>
           </motion.nav>
         )}

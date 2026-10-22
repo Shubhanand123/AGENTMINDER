@@ -72,12 +72,12 @@ export default function PricingPage() {
                     type="button"
                     aria-pressed={active}
                     onClick={() => t.set(i === 1)}
-                    className={cn("relative min-h-10 rounded-full px-4 text-sm font-medium transition-colors", active ? "text-neutral-950" : "text-neutral-300 hover:text-white")}
+                    className={cn("relative min-h-10 rounded-full px-4 text-sm font-medium transition-colors", active ? "text-[#0a0a0a]" : "text-neutral-300 hover:text-white")}
                   >
                     {active && (
                       <motion.span
                         layoutId={`toggle-${t.id}`}
-                        className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-orange-200"
+                        className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300"
                         transition={{ type: "spring", stiffness: 400, damping: 32 }}
                       />
                     )}
@@ -111,7 +111,7 @@ export default function PricingPage() {
                 )}
                 <div className="relative flex items-center justify-between gap-2">
                   <h2 className="text-lg font-semibold text-white">{p.name}</h2>
-                  {p.badge && <span className="rounded-full bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-orange-200 px-2.5 py-1 text-xs font-semibold text-neutral-950">{p.badge}</span>}
+                  {p.badge && <span className="rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300 px-2.5 py-1 text-xs font-semibold text-[#0a0a0a]">{p.badge}</span>}
                 </div>
                 <div className="relative">
                   <span className="font-display text-5xl font-bold text-white">

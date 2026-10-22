@@ -105,7 +105,7 @@ function Step({ step, index }: { step: (typeof STEPS)[number]; index: number }) 
       <motion.div style={{ rotate }} className="relative aspect-[4/3] overflow-hidden rounded-3xl ring-1 ring-white/10">
         <motion.img src={step.img} alt="" style={{ y: imgY, scale: 1.25 }} className="h-full w-full object-cover" />
         {index === 1 && (
-          <div className="absolute inset-0 grid place-items-center bg-black/35 p-6">
+          <div className="keep-dark absolute inset-0 grid place-items-center bg-black/35 p-6">
             <div className="w-full max-w-sm">
               <TagStream />
             </div>

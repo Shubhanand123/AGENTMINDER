@@ -18,7 +18,7 @@ function answer(question: string): string {
 /** Section 4 — ask AgentMinder a question; the orb thinks and answers. */
 export function DemoSection() {
   return (
-    <section id="demo" className="relative h-[100svh] min-h-[700px] overflow-hidden border-t border-white/5 bg-neutral-950">
+    <section id="demo" className="keep-dark relative h-[100svh] min-h-[700px] overflow-hidden border-t border-white/5 bg-neutral-950">
       <MorphOrb onSubmit={(text) => new Promise((res) => setTimeout(() => res(answer(text)), 1800))} minThinkMs={2600} />
 
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex flex-col items-center gap-4 px-5 pt-20 text-center sm:pt-28">

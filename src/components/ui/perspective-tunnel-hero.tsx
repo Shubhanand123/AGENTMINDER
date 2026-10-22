@@ -154,7 +154,7 @@ function TunnelCard({ card, progress, pointer, total, stage }: TunnelCardProps) 
                 opacity,
                 zIndex: card.index + 1,
             }}
-            className="pointer-events-auto absolute left-1/2 top-1/2 aspect-[4/5] will-change-transform select-none cursor-pointer"
+            className="keep-dark pointer-events-auto absolute left-1/2 top-1/2 aspect-[4/5] will-change-transform select-none cursor-pointer"
         >
             <div className="group relative h-full w-full overflow-hidden rounded-2xl bg-neutral-900 shadow-2xl shadow-black/90 ring-1 ring-white/15 transition-all duration-500 hover:ring-indigo-400/70 hover:shadow-indigo-500/25">
                 <img

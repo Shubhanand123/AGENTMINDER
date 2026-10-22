@@ -15,6 +15,7 @@ interface HalftoneWordmarkFooterProps {
 
 /* Dot colours: resting dots are cool, displaced dots heat up toward pink and orange. */
 const REST: [number, number, number] = [129, 140, 248]; // indigo-400
+const REST_LIGHT: [number, number, number] = [79, 70, 229]; // indigo-600, for light mode
 const MID: [number, number, number] = [232, 121, 249]; // fuchsia-400
 const HOT: [number, number, number] = [251, 146, 60]; // orange-400
 
@@ -94,10 +95,12 @@ function HalftoneWord({ word }: { word: string }) {
 
     const draw = () => {
       ctx.clearRect(0, 0, W, H);
+      const light = document.documentElement.classList.contains("light");
+      const rest = light ? REST_LIGHT : REST;
       for (let i = 0; i < count; i++) {
         const dx = px[i] - hx[i], dy = py[i] - hy[i];
         const disp = Math.min(1, Math.sqrt(dx * dx + dy * dy) / 40);
-        const c = disp < 0.5 ? mix(REST, MID, disp * 2) : mix(MID, HOT, (disp - 0.5) * 2);
+        const c = disp < 0.5 ? mix(rest, MID, disp * 2) : mix(MID, HOT, (disp - 0.5) * 2);
         ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},${0.55 + 0.45 * disp})`;
         ctx.beginPath();
         ctx.arc(px[i], py[i], rad[i] * (1 + disp * 0.35), 0, Math.PI * 2);
@@ -180,6 +183,9 @@ function HalftoneWord({ word }: { word: string }) {
       init();
     });
     let lastW = 0;
+    // redraw when the theme flips
+    const mo = new MutationObserver(() => draw());
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
     const ro = new ResizeObserver(([entry]) => {
       const w = Math.floor(entry.contentRect.width);
       if (w !== lastW) {
@@ -193,6 +199,7 @@ function HalftoneWord({ word }: { word: string }) {
     canvas.addEventListener("pointerdown", onDown);
     return () => {
       ro.disconnect();
+      mo.disconnect();
       cancelAnimationFrame(raf);
       canvas.removeEventListener("pointermove", onMove);
       canvas.removeEventListener("pointerleave", onLeave);
@@ -219,7 +226,7 @@ export default function HalftoneWordmarkFooter({
   className,
 }: HalftoneWordmarkFooterProps) {
   return (
-    <footer className={cn("relative overflow-hidden bg-[#09090b] text-neutral-300", className)}>
+    <footer className={cn("relative overflow-hidden bg-neutral-950 text-neutral-300", className)}>
       <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-[0.07] mix-blend-overlay" style={{ backgroundImage: GRAIN }} />
       <div className="relative mx-auto flex max-w-6xl flex-col gap-12 px-5 pb-10 pt-20">
         <div className="flex flex-col gap-12 lg:flex-row lg:justify-between">

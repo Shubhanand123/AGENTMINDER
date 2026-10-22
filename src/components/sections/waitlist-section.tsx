@@ -58,7 +58,7 @@ export function WaitlistSection({ plan }: { plan?: string } = {}) {
             <motion.span
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="self-start rounded-full bg-gradient-to-r from-indigo-300 via-fuchsia-300 to-orange-200 px-3 py-1 text-sm font-semibold capitalize text-neutral-950"
+              className="self-start rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300 px-3 py-1 text-sm font-semibold capitalize text-[#0a0a0a]"
             >
               Reserving the {plan} plan
             </motion.span>
@@ -78,7 +78,7 @@ export function WaitlistSection({ plan }: { plan?: string } = {}) {
                 className="flex flex-col items-start gap-4"
                 role="status"
               >
-                <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-indigo-400 via-fuchsia-400 to-orange-300 text-neutral-950">
+                <span className="grid h-12 w-12 place-items-center rounded-full bg-gradient-to-br from-indigo-400 via-fuchsia-400 to-orange-300 text-[#0a0a0a]">
                   <svg viewBox="0 0 16 16" className="h-6 w-6" aria-hidden="true">
                     <path d="M3 8.5l3 3 7-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>

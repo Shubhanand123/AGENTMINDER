@@ -9,6 +9,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Inter+Tight:wght@600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <title>AgentMinder — know what your AI agent said</title>
+    <script>
+      (function () {
+        var t = null;
+        try { t = localStorage.getItem("am-theme"); } catch (e) {}
+        if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        var c = document.documentElement.classList;
+        c.remove("dark", "light"); c.add(t);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -15,7 +15,7 @@ export default function AgentsPage() {
         <Reveal className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" stagger={0.07}>
           {AGENTS.map((a, i) => (
             <RevealItem key={a.slug} as="article">
-              <Link to={`/agents/${a.slug}`} className="group block focus-visible:outline-none" aria-label={`Open ${a.title}`}>
+              <Link to={`/agents/${a.slug}`} className="keep-dark group block focus-visible:outline-none" aria-label={`Open ${a.title}`}>
                 <motion.div
                   layoutId={`agent-img-${a.slug}`}
                   className="relative aspect-[4/5] overflow-hidden rounded-2xl ring-1 ring-white/10 transition-shadow duration-500 group-hover:shadow-[0_30px_80px_-30px_rgba(232,121,249,0.55)] group-focus-visible:ring-2 group-focus-visible:ring-indigo-300"
