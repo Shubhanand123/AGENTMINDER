@@ -127,7 +127,6 @@ function Tile({ f, onOpen }: { f: Feature; onOpen: () => void }) {
   return (
     <motion.button
       type="button"
-      layoutId={`feature-${f.id}`}
       onClick={onOpen}
       initial={{ opacity: 0, y: 26 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -145,7 +144,7 @@ function Tile({ f, onOpen }: { f: Feature; onOpen: () => void }) {
       </div>
       <div className="relative mt-auto flex flex-col gap-2">
         <div className="flex items-center justify-between gap-3">
-          <motion.h3 layoutId={`feature-title-${f.id}`} className="font-display text-xl font-semibold text-white">
+          <motion.h3 className="font-display text-xl font-semibold text-white">
             {f.title}
           </motion.h3>
           <span className="flex-none text-sm text-neutral-500 transition-transform group-hover:translate-x-1" aria-hidden="true">
@@ -172,14 +171,18 @@ function Detail({ f, onClose }: { f: Feature; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-[70] grid place-items-center p-4">
       <motion.div
-        className="absolute inset-0 bg-neutral-950/70 backdrop-blur-md"
+        className="absolute inset-0 bg-neutral-950/80"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
       />
       <motion.div
-        layoutId={`feature-${f.id}`}
+        initial={{ opacity: 0, scale: 0.94, y: 24 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 12 }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        style={{ willChange: "transform, opacity" }}
         role="dialog"
         aria-modal="true"
         aria-labelledby={`feature-dialog-${f.id}`}
@@ -198,7 +201,7 @@ function Detail({ f, onClose }: { f: Feature; onClose: () => void }) {
         </div>
         <div className="flex min-w-0 flex-col gap-4">
           <span className="self-start rounded-full bg-white/[0.06] px-3 py-1 font-mono text-[11px] uppercase tracking-widest text-indigo-300">{f.plan}</span>
-          <motion.h3 id={`feature-dialog-${f.id}`} layoutId={`feature-title-${f.id}`} className="font-display text-3xl font-bold text-white sm:text-4xl">
+          <motion.h3 id={`feature-dialog-${f.id}`} className="font-display text-3xl font-bold text-white sm:text-4xl">
             {f.title}
           </motion.h3>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="leading-relaxed text-neutral-300">
