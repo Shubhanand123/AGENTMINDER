@@ -192,13 +192,10 @@ function buildStripes() {
 }
 
 /** Short hairs flowing outward from the nose, in three tones. */
-const isSmall = () => typeof window !== "undefined" && window.matchMedia("(max-width: 768px), (pointer: coarse)").matches
-
 function buildHairs() {
   const r = rng(53)
   const tones = ["", "", ""]
-  const count = isSmall() ? 700 : 2600
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < 2600; i++) {
     const x = (r() - 0.5) * 1900
     const y = (r() - 0.5) * 480
     const a = Math.atan2(y - 150, x) + (r() - 0.5) * 0.5
@@ -231,7 +228,6 @@ const ALMOND = "M-78 10 C-52 -40 30 -56 80 -8 C44 40 -30 50 -78 10Z"
 const Fur = React.memo(function Fur({ id, fur }: { id: string; fur: string }) {
   const stripes = React.useMemo(buildStripes, [])
   const hairs = React.useMemo(buildHairs, [])
-  const light = React.useMemo(isSmall, [])
   return (
     <g>
       <rect x={-2600} y={-420} width={5200} height={840} fill={fur} />
@@ -246,7 +242,7 @@ const Fur = React.memo(function Fur({ id, fur }: { id: string; fur: string }) {
         ))}
         <ellipse cx={0} cy={188} rx={96} ry={52} opacity={0.85} />
       </g>
-      <g filter={light ? undefined : "url(#" + id + "-rough)"}>
+      <g filter={"url(#" + id + "-rough)"}>
         <path d={stripes} fill="#140b05" />
       </g>
       <path d={hairs[0]} stroke="#3b1c07" strokeWidth={1.4} opacity={0.35} strokeLinecap="round" />
@@ -619,7 +615,7 @@ export default function TigerTearReveal({
             {s.open > 0 ? (
               <g transform={tiger}>
                 <Fur id={id} fur={furColor} />
-                <g filter={s.pop > 0.02 && !isSmall() ? "url(#" + id + "-glow)" : undefined}>
+                <g filter={s.pop > 0.02 ? "url(#" + id + "-glow)" : undefined}>
                   {EYES.map(([x, y], i) => (
                     <Eye
                       key={i}

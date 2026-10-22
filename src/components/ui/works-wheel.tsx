@@ -260,8 +260,6 @@ export function WorksWheel({
   }, [to, last]);
 
   const drag = React.useRef<number | null>(null);
-  // On touch screens a vertical swipe belongs to the page; the wheel turns with a sideways swipe.
-  const touchAxis = React.useRef<"x" | "y">("y");
   const settling = React.useRef(0);
 
   return (
@@ -279,24 +277,16 @@ export function WorksWheel({
         role="listbox"
         aria-label={label}
         aria-activedescendant={`works-wheel-${active}`}
-        className="focus-visible:outline-foreground absolute inset-0 cursor-grab touch-pan-y outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 active:cursor-grabbing"
+        className="focus-visible:outline-foreground absolute inset-0 cursor-grab touch-pan-x outline-none focus-visible:outline-2 focus-visible:-outline-offset-4 active:cursor-grabbing"
         style={{ perspective: `${metrics.depth}px` }}
         onPointerDown={(event) => {
-          touchAxis.current = event.pointerType === "mouse" ? "y" : "x";
-          drag.current = touchAxis.current === "x" ? event.clientX : event.clientY;
-          if (event.pointerType === "mouse") event.currentTarget.setPointerCapture(event.pointerId);
-          // a tap on the ring opens it into the drum
-          else if (target.current < 1) to(1);
+          drag.current = event.clientY;
+          event.currentTarget.setPointerCapture(event.pointerId);
         }}
         onPointerMove={(event) => {
           if (drag.current === null) return;
-          const v = touchAxis.current === "x" ? event.clientX : event.clientY;
-          to(target.current + (drag.current - v) / (touchAxis.current === "x" ? DRAG_UNITS * 0.6 : DRAG_UNITS));
-          drag.current = v;
-        }}
-        onPointerCancel={() => {
-          drag.current = null;
-          if (target.current > 1) to(Math.round(target.current));
+          to(target.current + (drag.current - event.clientY) / DRAG_UNITS);
+          drag.current = event.clientY;
         }}
         onPointerUp={() => {
           // Land on an item rather than between two.
