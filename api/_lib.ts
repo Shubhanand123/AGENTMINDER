@@ -1,7 +1,8 @@
 // Shared server code for the AgentMinder backend (Vercel functions).
 // Needs three environment variables, set in Vercel → Project → Settings → Environment Variables:
-//   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY
-// Optional: JUDGE_MODEL (defaults to Claude Haiku).
+//   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+// and one reviewer key: GEMINI_API_KEY (free tier) or ANTHROPIC_API_KEY.
+// Optional: JUDGE_PROVIDER ("gemini" | "anthropic"), JUDGE_MODEL.
 import { createClient, type SupabaseClient } from "@supabase/supabase-js"
 import Anthropic from "@anthropic-ai/sdk"
 
@@ -201,12 +202,87 @@ type Report = {
   flags: { type: (typeof FLAG_TYPES)[number]; severity: "low" | "medium" | "high"; quote?: string; explanation: string; suggested_fix?: string }[]
 }
 
+/** Which reviewer runs: JUDGE_PROVIDER if set, else whichever key exists (Gemini first). */
+export function judgeConfig() {
+  const forced = (process.env.JUDGE_PROVIDER ?? "").toLowerCase()
+  const provider = forced === "anthropic" || forced === "gemini" ? forced : process.env.GEMINI_API_KEY ? "gemini" : process.env.ANTHROPIC_API_KEY ? "anthropic" : null
+  const model = process.env.JUDGE_MODEL || (provider === "anthropic" ? "claude-haiku-4-5" : "gemini-2.5-flash")
+  const key = provider === "gemini" ? process.env.GEMINI_API_KEY : provider === "anthropic" ? process.env.ANTHROPIC_API_KEY : undefined
+  return { provider, model, key }
+}
+
+async function judgeAnthropic(key: string, model: string, prompt: string): Promise<Report> {
+  const anthropic = new Anthropic({ apiKey: key })
+  const res = await anthropic.messages.create({
+    model,
+    max_tokens: 1500,
+    system: SYSTEM,
+    tools: [REPORT_TOOL],
+    tool_choice: { type: "tool", name: "report" },
+    messages: [{ role: "user", content: prompt }],
+  })
+  const tool = res.content.find((b) => b.type === "tool_use")
+  if (!tool || tool.type !== "tool_use") throw new Error("The reviewer did not return a report.")
+  return tool.input as Report
+}
+
+/* Gemini's schema dialect: upper-case types, no extra keywords. */
+const GEMINI_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    resolved: { type: "BOOLEAN" },
+    sentiment: { type: "STRING", enum: ["positive", "neutral", "negative"] },
+    summary: { type: "STRING" },
+    flags: {
+      type: "ARRAY",
+      items: {
+        type: "OBJECT",
+        properties: {
+          type: { type: "STRING", enum: [...FLAG_TYPES] },
+          severity: { type: "STRING", enum: ["low", "medium", "high"] },
+          quote: { type: "STRING" },
+          explanation: { type: "STRING" },
+          suggested_fix: { type: "STRING" },
+        },
+        required: ["type", "severity", "explanation"],
+      },
+    },
+  },
+  required: ["resolved", "sentiment", "summary", "flags"],
+}
+
+async function judgeGemini(key: string, model: string, prompt: string): Promise<Report> {
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-goog-api-key": key },
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM.replace("Always answer by calling the report tool.", "Answer only with the JSON report.") }] },
+      contents: [{ role: "user", parts: [{ text: prompt }] }],
+      generationConfig: { temperature: 0.1, maxOutputTokens: 2048, responseMimeType: "application/json", responseSchema: GEMINI_SCHEMA },
+    }),
+  })
+  const body = (await res.json().catch(() => null)) as {
+    candidates?: { content?: { parts?: { text?: string }[] } }[]
+    error?: { message?: string; status?: string }
+  } | null
+  if (!res.ok) {
+    const m = body?.error?.message ?? `Gemini answered ${res.status}`
+    throw new Error(res.status === 429 ? `Gemini free-tier limit reached; try again later. (${m})` : m)
+  }
+  const text = body?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? ""
+  try {
+    return JSON.parse(text) as Report
+  } catch {
+    throw new Error("The reviewer returned something that wasn't a report.")
+  }
+}
+
 export async function review(conversationId: string) {
-  const key = process.env.ANTHROPIC_API_KEY
+  const { provider, model, key } = judgeConfig()
   const { data: conv } = await db().from("conversations").select("id, agent_id, owner, messages, external_id").eq("id", conversationId).single()
   if (!conv) return
-  if (!key) {
-    await db().from("conversations").update({ status: "error", review_error: "ANTHROPIC_API_KEY is not set in Vercel." }).eq("id", conversationId)
+  if (!provider || !key) {
+    await db().from("conversations").update({ status: "error", review_error: "No reviewer key: set GEMINI_API_KEY (or ANTHROPIC_API_KEY) in Vercel." }).eq("id", conversationId)
     return
   }
   const [{ data: agent }, { data: rules }] = await Promise.all([
@@ -220,26 +296,11 @@ export async function review(conversationId: string) {
     .slice(-24000)
   const system = (conv.messages as Msg[]).find((m) => m.role === "system")?.content?.slice(0, 3000)
   const ruleText = rules?.length ? rules.map((r, i) => `${i + 1}. ${r.rule} (${r.severity})`).join("\n") : "None set."
+  const prompt = `Agent: ${agent?.name} (${agent?.kind} bot)\n\nOwner's rules:\n${ruleText}\n\n${system ? `The agent's own instructions (for context):\n${system}\n\n` : ""}Conversation:\n${transcript}`
 
   try {
-    const anthropic = new Anthropic({ apiKey: key })
-    const res = await anthropic.messages.create({
-      model: process.env.JUDGE_MODEL || "claude-haiku-4-5",
-      max_tokens: 1500,
-      system: SYSTEM,
-      tools: [REPORT_TOOL],
-      tool_choice: { type: "tool", name: "report" },
-      messages: [
-        {
-          role: "user",
-          content: `Agent: ${agent?.name} (${agent?.kind} bot)\n\nOwner's rules:\n${ruleText}\n\n${system ? `The agent's own instructions (for context):\n${system}\n\n` : ""}Conversation:\n${transcript}`,
-        },
-      ],
-    })
-    const tool = res.content.find((b) => b.type === "tool_use")
-    if (!tool || tool.type !== "tool_use") throw new Error("The reviewer did not return a report.")
-    const r = tool.input as Report
-    const flags = (r.flags ?? []).filter((f) => FLAG_TYPES.includes(f.type))
+    const r = provider === "gemini" ? await judgeGemini(key, model, prompt) : await judgeAnthropic(key, model, prompt)
+    const flags = (r.flags ?? []).filter((f) => FLAG_TYPES.includes(f.type) && f.explanation)
 
     await db().from("flags").delete().eq("conversation_id", conv.id)
     if (flags.length) {
@@ -250,16 +311,22 @@ export async function review(conversationId: string) {
           owner: conv.owner,
           type: f.type,
           severity: ["low", "medium", "high"].includes(f.severity) ? f.severity : "medium",
-          quote: f.quote?.slice(0, 400) ?? null,
+          quote: f.quote?.slice(0, 400) || null,
           explanation: f.explanation.slice(0, 1000),
-          suggested_fix: f.suggested_fix?.slice(0, 1000) ?? null,
+          suggested_fix: f.suggested_fix?.slice(0, 1000) || null,
         })),
       )
       if (error) throw error
     }
     await db()
       .from("conversations")
-      .update({ status: "reviewed", resolved: !!r.resolved, sentiment: r.sentiment, summary: r.summary?.slice(0, 500), review_error: null })
+      .update({
+        status: "reviewed",
+        resolved: !!r.resolved,
+        sentiment: ["positive", "neutral", "negative"].includes(r.sentiment) ? r.sentiment : "neutral",
+        summary: r.summary?.slice(0, 500),
+        review_error: null,
+      })
       .eq("id", conv.id)
 
     const urgent = flags.filter((f) => f.severity === "high")
