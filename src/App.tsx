@@ -12,6 +12,11 @@ import PricingPage from "@/pages/pricing-page"
 import DemoPage from "@/pages/demo-page"
 import WaitlistPage from "@/pages/waitlist-page"
 import NotFoundPage from "@/pages/not-found-page"
+import AppShell from "@/app/app-shell"
+import LoginPage from "@/app/login-page"
+import DashboardPage from "@/app/dashboard-page"
+import NewAgentPage from "@/app/new-agent-page"
+import AgentAppPage from "@/app/agent-page"
 
 const FOOTER_GROUPS = [
   {
@@ -56,6 +61,8 @@ function ScrollToTop() {
 
 export default function App() {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const inApp = pathname.startsWith("/app") || pathname.startsWith("/login")
 
   // Plain <a href="/..."> links (footer, copy) navigate inside the app instead of reloading the page.
   const onClickCapture = (e: MouseEvent<HTMLDivElement>) => {
@@ -70,6 +77,21 @@ export default function App() {
       navigate(href)
     }
   }
+
+  if (inApp)
+    return (
+      <>
+        <ScrollToTop />
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/app" element={<AppShell />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="new" element={<NewAgentPage />} />
+            <Route path="agents/:id" element={<AgentAppPage />} />
+          </Route>
+        </Routes>
+      </>
+    )
 
   return (
     <div className="min-h-screen bg-neutral-950" onClickCapture={onClickCapture}>

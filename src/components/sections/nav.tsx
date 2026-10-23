@@ -56,6 +56,9 @@ export function Nav() {
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
+          <NavLink to="/login" className="hidden min-h-11 items-center rounded-full px-4 text-sm text-neutral-300 hover:text-white lg:inline-flex">
+            Sign in
+          </NavLink>
           <NavLink
             to="/waitlist"
             className="hidden min-h-11 items-center rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300 px-5 text-sm font-semibold sm:inline-flex text-[#0a0a0a] transition-transform hover:scale-[1.04]"
@@ -93,6 +96,11 @@ export function Nav() {
                   </NavLink>
                 </motion.li>
               ))}
+              <li>
+                <NavLink to="/login" className="block py-3 font-display text-2xl font-semibold text-white">
+                  Sign in
+                </NavLink>
+              </li>
               <li className="pt-3">
                 <NavLink to="/waitlist" className="flex min-h-12 items-center justify-center rounded-full bg-gradient-to-r from-indigo-400 via-fuchsia-400 to-orange-300 font-semibold text-[#0a0a0a]">
                   Join the waitlist

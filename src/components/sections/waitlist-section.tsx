@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Confetti, type ConfettiRef } from "@/components/ui/confetti"
 import { Button } from "@/components/ui/button"
 import { Eyebrow } from "./shared"
+import { supabase } from "@/lib/supabase"
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
@@ -38,7 +39,11 @@ export function WaitlistSection({ plan }: { plan?: string } = {}) {
     }
     setError("")
     setJoined(true)
-    // TODO: send { name, email, company, plan } to your backend (e.g. a Supabase table or Resend audience).
+    // Saved to the Supabase waitlist table. Signups still show success if the save fails, and the error is logged.
+    supabase
+      .from("waitlist")
+      .insert({ name: name.trim() || null, email: email.trim(), company: company.trim() || null, plan: plan ?? null })
+      .then(({ error: err }) => err && console.error("waitlist save failed", err))
     confettiRef.current?.fire({ particleCount: 140, spread: 100, origin: { y: 0.55 }, colors: ["#818cf8", "#e879f9", "#fb923c", "#38bdf8", "#f472b6"] })
     sideCannons()
   }
